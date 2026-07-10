@@ -99,6 +99,23 @@ struct DylibPatch {
 
 static const void *gDyldCacheAddr = NULL;
 
+// Direct syscall to get the DSC base address natively without relying on missing symbols
+static const void* get_dsc_base(void) {
+    uint64_t start_address = 0;
+    register uint64_t x16 __asm__("x16") = 294; // shared_region_check_np
+    register uint64_t x0 __asm__("x0") = (uint64_t)&start_address;
+    __asm__ volatile(
+        "svc #0x80\n"
+        : "+r"(x0)
+        : "r"(x16)
+        : "memory", "cc"
+    );
+    if (x0 == 0) {
+        return (const void*)start_address;
+    }
+    return NULL;
+}
+
 static bool is_executable_dylib_offset(const void *slidMachHeader,
                                        uint64_t imageUnslidAddr,
                                        uint32_t dylibOffset)
@@ -193,6 +210,11 @@ void HOOK(_ZNK5dyld46Loader17applyCachePatchesERNS_12RuntimeStateERNS_34DyldCach
         return;
     if (!patches)
         return;
+        
+    // Retrieve cache address natively if not already set
+    if (!gDyldCacheAddr) {
+        gDyldCacheAddr = get_dsc_base();
+    }
     if (!gDyldCacheAddr)
         return;
 
@@ -248,50 +270,4 @@ void HOOK(_ZNK5dyld46Loader17applyCachePatchesERNS_12RuntimeStateERNS_34DyldCach
             continue;
 
         uintptr_t dscFuncAddr      = (uintptr_t)(dscDylibBase + exp->dylibOffsetOfImpl);
-        uintptr_t overrideFuncAddr = (uintptr_t)overrideBase + (uintptr_t)((intptr_t)overrideOff);
-
-        write_adrp_add_br_trampoline((void *)dscFuncAddr, (void *)overrideFuncAddr);
-    }
-}
-
-extern bool ORIG(_ZNK5dyld413ProcessConfig9DyldCache17isOverridablePathEPKc)(const void *dyldCache, const char *dylibPath);
-bool HOOK(_ZNK5dyld413ProcessConfig9DyldCache17isOverridablePathEPKc)(const void *dyldCache, const char *dylibPath)
-{
-    if (!gDyldCacheAddr && dyldCache) {
-        gDyldCacheAddr = *(const void *const *)dyldCache;
-    }
-    (void)dylibPath;
-    return true;
-}
-
-extern bool ORIG(_ZN5dyld413ProcessConfig9DyldCache23isAlwaysOverridablePathEPKc)(const char *dylibPath);
-bool HOOK(_ZN5dyld413ProcessConfig9DyldCache23isAlwaysOverridablePathEPKc)(const char *dylibPath)
-{
-    (void)dylibPath;
-    return true;
-}
-
-// ============================================================================
-// matchesPath hook — prevent double-loading of jbroot overrides
-// ============================================================================
-extern bool ORIG(_ZNK5dyld416JustInTimeLoader11matchesPathEPKc)(const void *self, const char *path);
-bool HOOK(_ZNK5dyld416JustInTimeLoader11matchesPathEPKc)(const void *self, const char *path)
-{
-    if (ORIG(_ZNK5dyld416JustInTimeLoader11matchesPathEPKc)(self, path))
-        return true;
-
-    if (path[0] == '/' && path[1] == 'v' && path[2] == 'a' && path[3] == 'r' && path[4] == '/') {
-        char buf[PATH_MAX];
-        strlcpy(buf, "/private", PATH_MAX);
-        strlcat(buf, path, PATH_MAX);
-        if (ORIG(_ZNK5dyld416JustInTimeLoader11matchesPathEPKc)(self, buf))
-            return true;
-    }
-
-    if (strncmp(path, "/private/var/", 13) == 0) {
-        if (ORIG(_ZNK5dyld416JustInTimeLoader11matchesPathEPKc)(self, path + 8))
-            return true;
-    }
-
-    return false;
-}
+        uintptr_t overrideFuncAddr = (uintptr_t)overrideBase + (uintptr_t)((int
