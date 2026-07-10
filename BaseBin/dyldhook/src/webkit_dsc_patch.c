@@ -270,4 +270,4 @@ void HOOK(_ZNK5dyld46Loader17applyCachePatchesERNS_12RuntimeStateERNS_34DyldCach
             continue;
 
         uintptr_t dscFuncAddr      = (uintptr_t)(dscDylibBase + exp->dylibOffsetOfImpl);
-        uintptr_t overrideFuncAddr = (uintptr_t)overrideBase + (uintptr_t)((int
+        uintptr_t overrideFuncAddr = (uintptr_t)overrideBase + (uintptr_t)((intptr_t)overrideOff);
