@@ -97,21 +97,37 @@ ___stack_chk_guard:
 // WebKitPlayground Hooks and Trampolines
 // ============================================================================
 
-// 1. Trampolines (External dyld functions we call but don't override)
-MAKE_TRAMPOLINE(_ZNK5dyld46Loader11loadAddressERNS_12RuntimeStateE)
-MAKE_TRAMPOLINE(_ZNK5dyld46Loader21overridesDylibInCacheERPKNS0_10DylibPatchERt)
-
-// 2. Hooks (Functions we actively override in webkit_dsc_patch.c)
-.global _MACHOMERGER_ORIG__ZNK5dyld416JustInTimeLoader11matchesPathEPKc
-.global _MACHOMERGER_HOOKTRAMPOLINE__ZNK5dyld416JustInTimeLoader11matchesPathEPKc
-_MACHOMERGER_ORIG__ZNK5dyld416JustInTimeLoader11matchesPathEPKc:
+.global _MACHOMERGER_ORIG__ZNK5dyld413ProcessConfig9DyldCache17isOverridablePathEPKc
+.global _MACHOMERGER_HOOKTRAMPOLINE__ZNK5dyld413ProcessConfig9DyldCache17isOverridablePathEPKc
+_MACHOMERGER_ORIG__ZNK5dyld413ProcessConfig9DyldCache17isOverridablePathEPKc:
     nop
-_MACHOMERGER_HOOKTRAMPOLINE__ZNK5dyld416JustInTimeLoader11matchesPathEPKc:
+    // FALLTHROUGH
+_MACHOMERGER_HOOKTRAMPOLINE__ZNK5dyld413ProcessConfig9DyldCache17isOverridablePathEPKc:
+    b .
+
+.global _MACHOMERGER_ORIG__ZN5dyld413ProcessConfig9DyldCache23isAlwaysOverridablePathEPKc
+.global _MACHOMERGER_HOOKTRAMPOLINE__ZN5dyld413ProcessConfig9DyldCache23isAlwaysOverridablePathEPKc
+_MACHOMERGER_ORIG__ZN5dyld413ProcessConfig9DyldCache23isAlwaysOverridablePathEPKc:
+    nop
+    // FALLTHROUGH
+_MACHOMERGER_HOOKTRAMPOLINE__ZN5dyld413ProcessConfig9DyldCache23isAlwaysOverridablePathEPKc:
     b .
 
 .global _MACHOMERGER_ORIG__ZNK5dyld46Loader17applyCachePatchesERNS_12RuntimeStateERNS_34DyldCacheDataConstLazyScopedWriterE
 .global _MACHOMERGER_HOOKTRAMPOLINE__ZNK5dyld46Loader17applyCachePatchesERNS_12RuntimeStateERNS_34DyldCacheDataConstLazyScopedWriterE
 _MACHOMERGER_ORIG__ZNK5dyld46Loader17applyCachePatchesERNS_12RuntimeStateERNS_34DyldCacheDataConstLazyScopedWriterE:
     nop
+    // FALLTHROUGH
 _MACHOMERGER_HOOKTRAMPOLINE__ZNK5dyld46Loader17applyCachePatchesERNS_12RuntimeStateERNS_34DyldCacheDataConstLazyScopedWriterE:
+    b .
+
+MAKE_TRAMPOLINE(_ZNK5dyld46Loader21overridesDylibInCacheERPKNS0_10DylibPatchERt)
+MAKE_TRAMPOLINE(_ZNK5dyld46Loader11loadAddressERNS_12RuntimeStateE)
+
+.global _MACHOMERGER_ORIG__ZNK5dyld416JustInTimeLoader11matchesPathEPKc
+.global _MACHOMERGER_HOOKTRAMPOLINE__ZNK5dyld416JustInTimeLoader11matchesPathEPKc
+_MACHOMERGER_ORIG__ZNK5dyld416JustInTimeLoader11matchesPathEPKc:
+    nop
+    // FALLTHROUGH
+_MACHOMERGER_HOOKTRAMPOLINE__ZNK5dyld416JustInTimeLoader11matchesPathEPKc:
     b .
