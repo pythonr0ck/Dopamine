@@ -301,20 +301,22 @@ bool HOOK(_ZNK5dyld416JustInTimeLoader11matchesPathEPKc)(const void *self, const
 // MachOMerger needs these symbols to exist during the initial clang linking
 // phase. MachOMerger will overwrite these stubs with actual branches later.
 // ============================================================================
-__asm__(
-".globl _MACHOMERGER_ORIG__ZNK5dyld416JustInTimeLoader11matchesPathEPKc\n"
-"_MACHOMERGER_ORIG__ZNK5dyld416JustInTimeLoader11matchesPathEPKc:\n"
-"    ret\n"
+.align 2
+.globl _MACHOMERGER_ORIG__ZNK5dyld416JustInTimeLoader11matchesPathEPKc
+_MACHOMERGER_ORIG__ZNK5dyld416JustInTimeLoader11matchesPathEPKc:
+    .space 16
 
-".globl _MACHOMERGER_ORIG__ZNK5dyld46Loader17applyCachePatchesERNS_12RuntimeStateERNS_34DyldCacheDataConstLazyScopedWriterE\n"
-"_MACHOMERGER_ORIG__ZNK5dyld46Loader17applyCachePatchesERNS_12RuntimeStateERNS_34DyldCacheDataConstLazyScopedWriterE:\n"
-"    ret\n"
+.align 2
+.globl _MACHOMERGER_ORIG__ZNK5dyld46Loader17applyCachePatchesERNS_12RuntimeStateERNS_34DyldCacheDataConstLazyScopedWriterE
+_MACHOMERGER_ORIG__ZNK5dyld46Loader17applyCachePatchesERNS_12RuntimeStateERNS_34DyldCacheDataConstLazyScopedWriterE:
+    .space 16
 
-".globl _MACHOMERGER_TRAMPOLINE__ZNK5dyld46Loader11loadAddressERNS_12RuntimeStateE\n"
-"_MACHOMERGER_TRAMPOLINE__ZNK5dyld46Loader11loadAddressERNS_12RuntimeStateE:\n"
-"    ret\n"
+.align 2
+.globl _MACHOMERGER_TRAMPOLINE__ZNK5dyld46Loader11loadAddressERNS_12RuntimeStateE
+_MACHOMERGER_TRAMPOLINE__ZNK5dyld46Loader11loadAddressERNS_12RuntimeStateE:
+    .space 16
 
-".globl _MACHOMERGER_TRAMPOLINE__ZNK5dyld46Loader21overridesDylibInCacheERPKNS0_10DylibPatchERt\n"
-"_MACHOMERGER_TRAMPOLINE__ZNK5dyld46Loader21overridesDylibInCacheERPKNS0_10DylibPatchERt:\n"
-"    ret\n"
-);
+.align 2
+.globl _MACHOMERGER_TRAMPOLINE__ZNK5dyld46Loader21overridesDylibInCacheERPKNS0_10DylibPatchERt
+_MACHOMERGER_TRAMPOLINE__ZNK5dyld46Loader21overridesDylibInCacheERPKNS0_10DylibPatchERt:
+    .space 16
